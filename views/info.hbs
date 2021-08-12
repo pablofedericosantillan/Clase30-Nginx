@@ -1,0 +1,45 @@
+<link rel="stylesheet" href="css/estilos.css">
+<script src="/socket.io/socket.io.js"></script>
+
+<h1 class="alert alert-success">
+    INFO Global Process
+</h1>
+ <h3 class="jumbotron">
+        <br>
+                <tr>
+                    <td>Argumentos de entrada 1: {{arg1}}</td>
+                     <br>
+                    <td>Argumentos de entrada 2: {{ arg2 }}</td>
+                    <br>
+                    <td>Nombre de la Plataforma: {{plataforma}}</td>
+                     <br>
+                    <td>Version de Nodejs: {{ versionNode }}</td>
+                    <br>
+                    <td>Uso de memoria:</td>
+                            <br>
+                        <td>-rss: {{memoria.rss}}</td>
+                            <br>
+                        <td>-heapTotal: {{memoria.heapTotal}}</td>
+                            <br>
+                        <td>-heapUsed: {{memoria.heapUsed}}</td>
+                            <br>
+                        <td>-external: {{memoria.external}}</td>
+                            <br>
+                        <td>-arrayBuffers: {{memoria.arrayBuffers}}</td>
+
+                     <br>
+                    <td>Path de Ejecucion: {{ path }}</td>
+                    <br>
+                    <td>Process id: {{processID}}</td>
+                     <br>
+                    <td>Carpeta corriente: {{ dirCarpeta }}</td>
+                    <br>
+
+                </tr>
+        <br>
+</h3>
+
+
+<script src="js/handlebars-v4.7.6.js"></script>
+<script src="js/main.js"></script>
+
