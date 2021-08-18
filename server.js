@@ -1,9 +1,29 @@
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
+const cluster = require('cluster');
+const numCPUs = require('os').cpus().length;
+
+// crear los workers
+if (cluster.isMaster &&  process.argv[2]=='CLUSTER' ) {
+
+    console.log('Num Process',numCPUs)
+    console.log(`PID MASTER ${process.pid}`)
+
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork(); // creamos un worker para cada cpu
+    }
+
+    // controlamos la salida de los workers
+    cluster.on('exit', worker => {
+        console.log('Worker', worker.process.pid, 'died', new Date().toLocaleString());
+        cluster.fork();
+    });
+
+} else{
+
 const io = require('socket.io')(http);
 const productos = require('./api/productos');
-
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(express.static('public'))
@@ -63,8 +83,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // completar con sus credenciales
-const FACEBOOK_CLIENT_ID = process.argv[3] || process.env.FACEBOOK_CLIENT_ID;
-const FACEBOOK_CLIENT_SECRET = process.argv[4] ||process.env.FACEBOOK_CLIENT_SECRET;
+const FACEBOOK_CLIENT_ID = process.argv[4] || process.env.FACEBOOK_CLIENT_ID;
+const FACEBOOK_CLIENT_SECRET = process.argv[5] ||process.env.FACEBOOK_CLIENT_SECRET;
 
 // configuramos passport para usar facebook
 passport.use(new FacebookStrategy({
@@ -127,17 +147,6 @@ app.get('/info', function_passport.info);
 //-RAMDOMS
 app.get('/randoms', function_passport.randoms);
 
-
-
-
-
-
-
-
-
-
-
-
 /* -------------------- Web Sockets ---------------------- */
 const mensajes = [];
 io.on('connection', async socket => {
@@ -157,10 +166,11 @@ io.on('connection', async socket => {
 });
 
 /* ------------------------------------------------------- */
-/* ------------------------------------------------------- */
-const PORT = process.argv[2] || 8080;
+const PORT = parseInt(process.argv[3]) || 8080;
 http.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
+    //console.log(`Servidor escuchando en http://localhost:${PORT}`);
+    console.log(`Servidor express escuchando en http://localhost:${PORT} - PID WORKER ${process.pid}`)
 });
 http.on("error", error => console.log(`Error en servidor ${error}`))
 
+}

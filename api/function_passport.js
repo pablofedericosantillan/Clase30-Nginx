@@ -64,7 +64,8 @@ function getLogout (req, res) {
 
 //-INFO
 function info(req, res) {
-
+  const numCPUs = require('os').cpus().length;
+/*
   process.stdout.write('Argumentos de entrada\n')
   process.argv.forEach((arg, index) => {
       console.log(index + ' -> ' + arg)
@@ -76,11 +77,12 @@ function info(req, res) {
   console.log('Path de Ejecucion: ',process.execPath);
   console.log('Process id', process.pid)
   console.log('Carpeta corriente:', process.cwd())
-
+*/
 
   res.render("info", {
-    arg1: process.argv[3],
-    arg2: process.argv[4],
+    numCPU: numCPUs,
+    arg1: process.argv[4],
+    arg2: process.argv[5],
     plataforma: process.platform,
     versionNode: process.version,
     memoria: process.memoryUsage(),
@@ -88,6 +90,7 @@ function info(req, res) {
     processID: process.pid,
     dirCarpeta: process.cwd()
 })
+console.log(numCPUs)
 
 }
 
@@ -97,12 +100,13 @@ const { fork } = require('child_process')
 function randoms(req, res) {
   let {cant} = req.query;
   if (!cant){
-    cant=100000000;
+    cant=1000000;
   }
         const computo = fork(__dirname + '/fork.js')
         computo.send(cant)
         computo.on('message', sum => {
-            res.end(`Array de nros ramdom [${JSON.stringify(sum)}]`)
+            console.log(`Randoms - PID WORKER ${process.pid}`)
+            res.end(`PID WORKER ${process.pid} \n Array de nros ramdom \n [${JSON.stringify(sum)}]`)
         })
     }
 
