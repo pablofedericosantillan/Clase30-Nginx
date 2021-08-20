@@ -1,11 +1,37 @@
+// -------------- MODO FORK -------------------
+//pm2 start server.js --name="Server1" --watch -- 8081 FORK 
+
+// -------------- MODO CLUSTER -------------------
+//pm2 start server.js --name="Server2" --watch -i max -- 8082 CLUSTER 
+//o
+//pm2 start server.js --name="Server1" --watch -- 8082 CLUSTER 
+
+
+//pm2 list
+//pm2 delete id/name
+//pm2 desc name
+//pm2 monit
+//pm2 --help
+//pm2 logs
+//pm2 flush
+
+// ------------------ NGINX ----------------------
+//http://nginx.org/en/docs/windows.html
+//start nginx
+//tasklist /fi "imagename eq nginx.exe"
+//nginx -s reload
+//nginx -s quit
+
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 
+
+//console.log('p',process.argv[3])
 // crear los workers
-if (cluster.isMaster &&  process.argv[2]=='CLUSTER' ) {
+if (cluster.isMaster &&  process.argv[3]=='CLUSTER' ) {
 
     console.log('Num Process',numCPUs)
     console.log(`PID MASTER ${process.pid}`)
@@ -26,7 +52,7 @@ const io = require('socket.io')(http);
 const productos = require('./api/productos');
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use(express.static('public'))
+//app.use(express.static('public'))
 
 /* -------------------- Base de Datos ---------------------- */
 require('./baseDatos/models/coneccion');
@@ -83,8 +109,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // completar con sus credenciales
-const FACEBOOK_CLIENT_ID = process.argv[4] || process.env.FACEBOOK_CLIENT_ID;
-const FACEBOOK_CLIENT_SECRET = process.argv[5] ||process.env.FACEBOOK_CLIENT_SECRET;
+const FACEBOOK_CLIENT_ID = process.env.FACEBOOK_CLIENT_ID; //process.argv[4] || 
+const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET //process.argv[5] ||;
 
 // configuramos passport para usar facebook
 passport.use(new FacebookStrategy({
@@ -166,7 +192,7 @@ io.on('connection', async socket => {
 });
 
 /* ------------------------------------------------------- */
-const PORT = parseInt(process.argv[3]) || 8080;
+const PORT = parseInt(process.argv[2]) || 8080;
 http.listen(PORT, () => {
     //console.log(`Servidor escuchando en http://localhost:${PORT}`);
     console.log(`Servidor express escuchando en http://localhost:${PORT} - PID WORKER ${process.pid}`)
